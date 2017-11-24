@@ -1,29 +1,21 @@
 const dgram = require('dgram');
 
-const ANY_IPV4_ADDRESS = '0.0.0.0'
-const ANY_IPV6_ADDRESS = '::'
+const ANY_IPV4_ADDRESS = '0.0.0.0';
+const ANY_IPV6_ADDRESS = '::';
 const ANY_PORT = 0;
 const UDP_IPV4 = 'udp4';
 const UDP_IPV6 = 'udp6';
-
-module.exports = {
-    create: function create(destinationPort, destinationAddress, protocol, port,
-        address, multicastAddress, forwarderPort, forwarderAddress) {
-        return new UdpForwarder(destinationPort, destinationAddress, protocol, port, 
-            address, multicastAddress, forwarderPort, forwarderAddress);
-    }
-};
 
 function UdpForwarder(destinationPort, destinationAddress, protocol, port,
     address, multicastAddress, forwarderPort, forwarderAddress) {
 
     this.destinationPort = destinationPort;
     if (this.destinationPort === undefined) {
-        throw 'Need port to forward datagrams to.';
-    }    
+        throw String('Need port to forward datagrams to.');
+    }
     this.destinationAddress = destinationAddress;
     if (this.destinationAddress === undefined) {
-        throw 'Need host name or address to forward datagrams to.';
+        throw String('Need host name or address to forward datagrams to.');
     }
     this.protocol = protocol;
     if (this.protocol === undefined) {
@@ -67,8 +59,9 @@ function UdpForwarder(destinationPort, destinationAddress, protocol, port,
     });
 
     o.forwarder.on('message', (msg, rinfo) => {
-        if (o.serverRemoteEndpoint != undefined) {
-            o.server.send(msg, o.serverRemoteEndpoint.port, o.serverRemoteEndpoint.address);
+        if (o.serverRemoteEndpoint !== undefined) {
+            o.server.send(msg, o.serverRemoteEndpoint.port,
+                o.serverRemoteEndpoint.address);
         }
     });
 
@@ -86,7 +79,8 @@ function UdpForwarder(destinationPort, destinationAddress, protocol, port,
         const address = o.server.address();
         console.log(`listening on ${address.address}:${address.port}`);
         if (o.multicastAddress && o.multicastInterface) {
-            console.log(`adding membership to group ${o.multicastAddress} on interface ${o.multicastInterface}`);
+            console.log(`adding membership to group ${o.multicastAddress}`
+                + ` on interface ${o.multicastInterface}`);
             o.server.addMembership(o.multicastAddress, o.multicastInterface);
         }
     });
@@ -94,8 +88,10 @@ function UdpForwarder(destinationPort, destinationAddress, protocol, port,
     o.forwarder.bind(o.forwarderPort, o.forwarderAddress);
 
     var isWindows = /^win/.test(process.platform);
-    if (!isWindows && (o.address != ANY_IPV4_ADDRESS || o.address != ANY_IPV6_ADDRESS)) {
-        console.log(`cannot use ${o.address}, only Windows supports listening for multicast on a specific interface`);
+    if (!isWindows
+        && (o.address !== ANY_IPV4_ADDRESS || o.address !== ANY_IPV6_ADDRESS)) {
+        console.log(`cannot listen for multicast datagrams at ${o.address},`
+            + ` it is only supported on Windows`);
     }
     if (!isWindows && o.multicastAddress && o.protocol === UDP_IPV4) {
         o.address = ANY_IPV4_ADDRESS;
@@ -109,4 +105,13 @@ function UdpForwarder(destinationPort, destinationAddress, protocol, port,
 UdpForwarder.prototype.end = function() {
     this.server.close();
     this.forwarder.close();
+};
+
+module.exports = {
+    create: function create(destinationPort, destinationAddress, protocol, port,
+        address, multicastAddress, forwarderPort, forwarderAddress) {
+        return new UdpForwarder(destinationPort, destinationAddress,
+            protocol, port, address, multicastAddress,
+            forwarderPort, forwarderAddress);
+    }
 };

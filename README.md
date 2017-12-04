@@ -1,4 +1,4 @@
-# node-udp-forwarder [![Codacy Badge](https://api.codacy.com/project/badge/Grade/e9d12b56dd6649e1ab966be1198a0ec9)](https://www.codacy.com/app/tewarid/node-udp-forwarder?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=tewarid/node-udp-forwarder&amp;utm_campaign=Badge_Grade)
+# node-udp-forwarder [![Codacy Badge](https://api.codacy.com/project/badge/Grade/e9d12b56dd6649e1ab966be1198a0ec9)](https://www.codacy.com/app/tewarid/node-udp-forwarder?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=tewarid/node-udp-forwarder&amp;utm_campaign=Badge_Grade) [![Maintainability](https://api.codeclimate.com/v1/badges/e059350e706ac9f80440/maintainability)](https://codeclimate.com/github/tewarid/node-udp-forwarder/maintainability)
 
 A simple UDP datagram forwarder / proxy. Akin to [socat](http://www.dest-unreach.org/socat/doc/socat-multicast.html) but multi-platform, extensible, and hackable. Provides a command line interface (CLI) and an API.
 

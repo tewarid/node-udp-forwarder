@@ -34,9 +34,22 @@ IP version 4 is chosen here using `udp4` but IP version 6 may also be specified 
 ```javascript
 const udpf = require("node-udp-forwarder");
 
-var f = udpf.create(4007, '10.211.55.3',
-    'udp4', 9903, '10.211.55.2',
-    '225.0.0.1', 0, '10.211.55.2');
+const options = {
+    protocol: 'udp4',
+    port: 9903,
+    address: '10.211.55.2',
+    multicastAddress: '225.0.0.1',
+    forwarderPort: 0,
+    forwarderAddress: '10.211.55.2',
+    created: created
+};
+
+var f = udpf.create(4007, '10.211.55.3', options);
+
+function created() {
+    console.log(`listening on ${f.address}:${f.port}`);
+    console.log(`forwarding from ${f.forwarderAddress}:${f.forwarderPort}`);
+}
 
 // call f.end() when done
 ```

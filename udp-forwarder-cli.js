@@ -12,11 +12,22 @@ const argv = require("optimist")
 .boolean("q")
 .argv;
 
-const f = udpf.create(argv.destinationPort, argv.destinationAddress,
-    argv.protocol,
-    argv.port, argv.address,
-    argv.multicastAddress,
-    argv.forwarderPort, argv.forwarderAddress);
+const options = {
+    protocol: argv.protocol,
+    port: argv.port,
+    address: argv.address,
+    multicastAddress: argv.multicastAddress,
+    forwarderPort: argv.forwarderPort,
+    forwarderAddress: argv.forwarderAddress,
+    created: created
+};
+
+const f = udpf.create(argv.destinationPort, argv.destinationAddress, options);
+
+function created() {
+    console.log(`listening on ${f.address}:${f.port}`);
+    console.log(`forwarding from ${f.forwarderAddress}:${f.forwarderPort}`);
+}
 
 process.on("uncaughtException", function(err) {
     console.info(err);

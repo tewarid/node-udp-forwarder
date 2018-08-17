@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 var argv = require("commander");
-var packageConfig = require('./package.json');
+var packageConfig = require("./package.json");
 
 argv
 .usage("[options]")
@@ -18,7 +18,7 @@ argv
 .option("-o, --forwarderAddress [address]", "Forward from specified IP address")
 .parse(process.argv);
 
-const options = {
+var options = {
     protocol: argv.protocol,
     port: argv.port,
     address: argv.address,
@@ -28,12 +28,13 @@ const options = {
     created: created
 };
 
-const f = require('./udp-forwarder.js').create(argv.destinationPort,
+var f = require("./udp-forwarder.js").create(argv.destinationPort,
     argv.destinationAddress, options);
 
 function created() {
-    console.log(`listening on ${f.address}:${f.port}`);
-    console.log(`forwarding from ${f.forwarderAddress}:${f.forwarderPort}`);
+    console.log("listening on " + f.address + ":" + f.port);
+    console.log("forwarding from " + f.forwarderAddress + ":" +
+        f.forwarderPort);
 }
 
 process.on("uncaughtException", function(err) {

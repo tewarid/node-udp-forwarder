@@ -16,7 +16,9 @@ module.exports = {
 };
 
 function parse(o) {
-    if (typeof o === "string") {
+    if (typeof o === "number") {
+        return [o];
+    } else if (typeof o === "string") {
         return o.split(",");
     } else if (Array.isArray(o)) {
         return o;

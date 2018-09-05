@@ -11,9 +11,10 @@ argv
     "Join and listen for datagrams from specified multicast group")
 .option("-i, --protocol [udp4|udp6]",
     "Specify udp4 to use IPv4, udp6 to use IPv6", "udp4")
-.option("-d, --destinationPort <number>", "Forward to specified port", parseInt)
-.option("-n, --destinationAddress <host>",
-    "Forward to specified host name, or unicast or multicast IP address")
+.option("-d, --destinationPort <port1,port2...>",
+    "Forward to specified port(s)")
+.option("-n, --destinationAddress <host1,host2...>",
+    "Forward to specified host name(s), or unicast or multicast IP address(es)")
 .option("-f, --forwarderPort [number]", "Forward from specified port", parseInt)
 .option("-o, --forwarderAddress [address]", "Forward from specified IP address")
 .parse(process.argv);

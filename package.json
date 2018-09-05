@@ -2,7 +2,7 @@
     "name": "node-udp-forwarder",
     "description": "A simple UDP forwarder",
     "license": "MIT",
-    "version": "0.0.4",
+    "version": "0.0.5",
     "main": "index.js",
     "repository": {
         "type": "git",

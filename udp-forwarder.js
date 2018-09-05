@@ -15,27 +15,36 @@ module.exports = {
     }
 };
 
+function parse(o) {
+    if (typeof o === "string") {
+        return o.split(",");
+    } else if (Array.isArray(o)) {
+        return o;
+    } else {
+        throw new Error("cannot parse object: " + o);
+    }
+}
+
 function UdpForwarder(destinationPort, destinationAddress, options) {
     this.initialize(destinationPort, destinationAddress, options);
 }
 
 UdpForwarder.prototype.initialize = function(destinationPort,
     destinationAddress, options) {
-    var self = this;
-    self.destinationPort = destinationPort;
-    if (self.destinationPort === undefined) {
+    if (destinationPort === undefined) {
         throw String("Need port to forward datagrams to.");
     }
-    self.destinationAddress = destinationAddress;
-    if (self.destinationAddress === undefined) {
+    this.destinationPort = parse(destinationPort);
+    if (destinationAddress === undefined) {
         throw String("Need host name or address to forward datagrams to.");
     }
-    self.options = options;
-    self.protocol = options.protocol || UDP_IPV4;
-    self.listeners = 0;
-    self.sourceRemoteEndpoint = undefined;
-    self.initializeForwarder();
-    self.initializeSource();
+    this.destinationAddress =parse(destinationAddress);
+    this.options = options;
+    this.protocol = options.protocol || UDP_IPV4;
+    this.listeners = 0;
+    this.sourceRemoteEndpoint = undefined;
+    this.initializeForwarder();
+    this.initializeSource();
 };
 
 UdpForwarder.prototype.initializeForwarder = function() {
@@ -60,10 +69,9 @@ UdpForwarder.prototype.initializeForwarder = function() {
 };
 
 UdpForwarder.prototype.evaluateForwarderOptions = function() {
-    var self = this;
-    self.forwarderPort = self.options.forwarderPort || ANY_PORT;
-    self.forwarderAddress = self.options.forwarderAddress ||
-        anyIPAddress(self.protocol);
+    this.forwarderPort = this.options.forwarderPort || ANY_PORT;
+    this.forwarderAddress = this.options.forwarderAddress ||
+        anyIPAddress(this.protocol);
 };
 
 UdpForwarder.prototype.initializeSource = function() {
@@ -75,7 +83,7 @@ UdpForwarder.prototype.initializeSource = function() {
     });
     self.source.on("message", function(msg, rinfo) {
         self.sourceRemoteEndpoint = rinfo;
-        self.forwarder.send(msg, self.destinationPort, self.destinationAddress);
+        self.sendAll(msg);
     });
     self.source.on("listening", function() {
         var address = self.source.address();
@@ -93,17 +101,16 @@ UdpForwarder.prototype.initializeSource = function() {
 };
 
 UdpForwarder.prototype.evaluateSourceOptions = function() {
-    var self = this;
-    self.port = self.options.port || ANY_PORT;
-    self.address = self.options.address || anyIPAddress(self.protocol);
+    this.port = this.options.port || ANY_PORT;
+    this.address = this.options.address || anyIPAddress(this.protocol);
     var isWindows = /^win/.test(process.platform);
-    if (!isWindows && self.options.multicastAddress) {
-        var address = anyIPAddress(self.protocol);
-        if (self.address !== address) {
+    if (!isWindows && this.options.multicastAddress) {
+        var address = anyIPAddress(this.protocol);
+        if (this.address !== address) {
             console.log("listening for multicast datagrams on a " +
-                "specific interface such as " + self.address +
+                "specific interface such as " + this.address +
                 " is only supported on Windows");
-            self.address = address;
+                this.address = address;
         }
     }
 };
@@ -117,16 +124,22 @@ function anyIPAddress(protocol) {
 };
 
 UdpForwarder.prototype.invokeCreated = function() {
-    var self = this;
-    self.listeners++;
-    if (self.listeners == 2 && self.options.created) {
-        self.options.created();
+    this.listeners++;
+    if (this.listeners == 2 && this.options.created) {
+        this.options.created();
     }
 };
 
 UdpForwarder.prototype.endDueToError = function(message, err) {
     console.log(message + ":\n" + err.stack);
     this.end();
+};
+
+UdpForwarder.prototype.sendAll = function(msg) {
+    for (var i = 0; i < this.destinationAddress.length; i++) {
+        this.forwarder.send(msg, this.destinationPort[i],
+            this.destinationAddress[i]);
+    }
 };
 
 UdpForwarder.prototype.end = function() {

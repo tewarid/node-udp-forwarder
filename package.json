@@ -2,7 +2,7 @@
     "name": "node-udp-forwarder",
     "description": "A simple UDP forwarder",
     "license": "MIT",
-    "version": "0.0.5",
+    "version": "0.0.6",
     "main": "index.js",
     "repository": {
         "type": "git",
@@ -12,10 +12,10 @@
         "udpforwarder": "./udp-forwarder-cli.js"
     },
     "dependencies": {
-        "commander": "^2.15.1"
+        "commander": "^2.19.0"
     },
     "devDependencies": {
-        "eslint": "^4.0.0",
+        "eslint": "^4.19.1",
         "eslint-config-google": "^0.8.0",
         "eslint-plugin-security": "^1.4.0"
     }

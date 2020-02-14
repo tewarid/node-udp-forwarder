@@ -33,6 +33,19 @@ IP version 4 is chosen here using `udp4` but IP version 6 may also be specified 
 
 ```javascript
 const udpf = require("node-udp-forwarder");
+/**
+ * messageAdapter is invoked once per received message and should return an array of transformed messages.
+ * it can change the message, omit the message, create new messages, or any combination thereof
+ *
+ * @param msg the received message buffer
+ * @param rInfo the message remote source info 
+ * @returns {[*]} an array of string or byte buffers to be forwarded to the destination
+ */
+function messageAdapter (msg, rInfo) {
+  const newMessage = `${msg.toString()}-transformed`;
+  return [msg, newMessage];
+}
+
 
 const options = {
     protocol: 'udp4',
@@ -41,6 +54,7 @@ const options = {
     multicastAddress: '225.0.0.1',
     forwarderPort: 0,
     forwarderAddress: '10.211.55.2',
+    messageAdapter: messageAdapter, // optional
     created: created
 };
 
@@ -52,4 +66,11 @@ function created() {
 }
 
 // call f.end() when done
+```
+
+## Transforming Messages
+
+```javascript
+
+const options = 
 ```

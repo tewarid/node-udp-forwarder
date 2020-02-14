@@ -15,6 +15,10 @@ module.exports = {
     }
 };
 
+function defaultMessageAdapter(msg, rInfo) {
+    return [msg];
+}
+
 function parse(o) {
     if (typeof o === "number") {
         return [o];
@@ -52,14 +56,19 @@ UdpForwarder.prototype.initialize = function(destinationPort,
 UdpForwarder.prototype.initializeForwarder = function() {
     var self = this;
     self.evaluateForwarderOptions();
+    self.messageAdapter = self.options.messageAdapter || defaultMessageAdapter;
     self.forwarder = dgram.createSocket(self.protocol);
     self.forwarder.on("error", function(err) {
         endDueToError("forwarder error", err);
     });
     self.forwarder.on("message", function(msg, rinfo) {
         if (self.sourceRemoteEndpoint !== undefined) {
-            self.source.send(msg, self.sourceRemoteEndpoint.port,
-                self.sourceRemoteEndpoint.address);
+            self.messageAdapter(msg, rinfo).forEach(
+                function(msg) {
+                    self.source.send(msg, self.sourceRemoteEndpoint.port,
+                        self.sourceRemoteEndpoint.address);
+                }
+            );
         }
     });
     self.forwarder.on("listening", function() {
@@ -79,13 +88,18 @@ UdpForwarder.prototype.evaluateForwarderOptions = function() {
 UdpForwarder.prototype.initializeSource = function() {
     var self = this;
     self.evaluateSourceOptions();
+    self.messageAdapter = self.options.messageAdapter || defaultMessageAdapter;
     self.source = dgram.createSocket(self.protocol);
     self.source.on("error", function(err) {
         endDueToError("source error", err);
     });
     self.source.on("message", function(msg, rinfo) {
         self.sourceRemoteEndpoint = rinfo;
-        self.sendAll(msg);
+        self.messageAdapter(msg, rinfo).forEach(
+            function(msg) {
+                self.sendAll(msg);
+            }
+        );
     });
     self.source.on("listening", function() {
         var address = self.source.address();

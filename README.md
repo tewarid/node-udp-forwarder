@@ -67,10 +67,3 @@ function created() {
 
 // call f.end() when done
 ```
-
-## Transforming Messages
-
-```javascript
-
-const options = 
-```

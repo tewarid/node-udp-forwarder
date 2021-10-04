@@ -59,7 +59,7 @@ UdpForwarder.prototype.initializeForwarder = function() {
     self.messageAdapter = self.options.messageAdapter || defaultMessageAdapter;
     self.forwarder = dgram.createSocket(self.protocol);
     self.forwarder.on("error", function(err) {
-        endDueToError("forwarder error", err);
+        self.endDueToError("forwarder error", err);
     });
     self.forwarder.on("message", function(msg, rinfo) {
         if (self.sourceRemoteEndpoint !== undefined) {
@@ -91,7 +91,7 @@ UdpForwarder.prototype.initializeSource = function() {
     self.messageAdapter = self.options.messageAdapter || defaultMessageAdapter;
     self.source = dgram.createSocket(self.protocol);
     self.source.on("error", function(err) {
-        endDueToError("source error", err);
+        self.endDueToError("source error", err);
     });
     self.source.on("message", function(msg, rinfo) {
         self.sourceRemoteEndpoint = rinfo;
